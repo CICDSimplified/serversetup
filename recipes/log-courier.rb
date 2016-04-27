@@ -26,12 +26,23 @@ if platform_family?('debian')
 	package 'log-courier' do
                 package_name 'log-courier'
         end
-	 template '/etc/log-courier/log-courier.conf' do
+	bash 'create_cert_dir' do
+		code <<-EOH
+			mkdir -p /etc/pki/tls/certs
+		EOH
+	end
+	template '/etc/pki/tls/certs/logstash-forwarder.crt' do
+                source 'logstash-forwarder.erb'
+                owner 'root'
+                group 'root'
+                mode '0755'
+       end
+	template '/etc/log-courier/log-courier.conf' do
                 source 'log-courier.erb'
                 owner 'root'
                 group 'root'
                 mode '0755'  
-        end
+       end
 	service 'log-courier' do
 		action :restart
 	end
