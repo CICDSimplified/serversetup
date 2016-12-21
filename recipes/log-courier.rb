@@ -31,6 +31,11 @@ if platform_family?('debian')
 			mkdir -p /etc/pki/tls/certs
 		EOH
 	end
+	bash 'create_log_courier_log' do
+		code <<-EOH
+			mkdir -p /var/log/log-courier
+		EOH
+	end
 	template '/etc/pki/tls/certs/logstash-forwarder.crt' do
                 source 'logstash-forwarder.erb'
                 owner 'root'
@@ -44,6 +49,8 @@ if platform_family?('debian')
                 mode '0755'  
        end
 	service 'log-courier' do
-		action :restart
+		service_name 'log-courier'
+		start_command 'log-courier -config=/etc/log-courier/log-courier.conf'
+		action :start
 	end
 end
